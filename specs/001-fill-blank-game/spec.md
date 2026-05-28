@@ -8,6 +8,16 @@
 
 **Input**: User description: "Foreign language learners need a variety of ways to practice their target language. To help reinforce spelling and recall, we are creating a fill-in the blank game that allows people to practice with text they provide, paste in text in their target language, and gives them the opportunity to fill-in the blank. Afterwards they are given a score and list of the words they answered incorrectly with the correct spellings."
 
+## Clarifications
+
+### Session 2026-05-28
+
+- Q: How should the system define a "word" when scanning the pasted passage to pick blank candidates? → A: Unicode-aware default — standard Unicode word breaks; letters and combining marks form a word; contractions like "don't" and hyphenated compounds like "well-known" stay as one token; CJK uses one character per token.
+- Q: What management actions and limits should v1 give the learner over their saved sessions? → A: Cap + delete + auto-label. Sessions are auto-labeled from passage text and date; the learner can delete any session manually; a hard cap (default 20) evicts the oldest completed session when exceeded; in-progress sessions are never auto-evicted.
+- Q: How should the system handle passages longer than one round can comfortably accommodate? → A: Cap blanks per round. The full passage stays visible as context, but only a bounded number of words actually become blanks. The cap may scale with difficulty, and blank positions are spread across the entire passage rather than concentrated at the start.
+- Q: What accessibility baseline should v1 commit to? → A: WCAG 2.1 Level AA, plus keyboard-complete navigation and screen-reader-readable score and review list. Every blank is reachable by keyboard with reading-order focus; the score and incorrect-word list are announced; color/contrast meets AA.
+- Q: What is v1's privacy stance on the pasted text and on usage telemetry? → A: Fully offline. After the initial load of the application's assets, nothing leaves the device — no passage content, no answers, no telemetry, no analytics, no crash/error reporting. The app should also continue to work without a network connection once loaded.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Practice spelling and recall using my own text (Priority: P1)
@@ -76,6 +86,9 @@ The learner can come back to the app later — same browser, same device — and
 2. **Given** the learner has finished one or more rounds previously, **When** they open the app, **Then** they can see and reopen those past sessions and view their score and review list.
 3. **Given** the learner opens the app in a different browser or on a different device, **When** they look for prior sessions, **Then** none are shown, because session storage is local to one browser.
 4. **Given** the learner explicitly clears their browser's site data, **When** they reopen the app, **Then** prior sessions are gone and the app starts fresh; the system does not promise recovery.
+5. **Given** the learner has saved sessions, **When** they view the session list, **Then** each session shows an auto-generated label (passage snippet + date) and a way to delete it.
+6. **Given** the saved-session count is already at the cap and at least one session is completed, **When** the learner starts a new round, **Then** the oldest completed session is evicted automatically and the new round is created.
+7. **Given** the saved-session count is at the cap and all sessions are in-progress, **When** the learner attempts to start a new round, **Then** the system blocks the new round and tells the learner to finish or delete an existing session first.
 
 ---
 
@@ -96,7 +109,7 @@ After seeing their results, the learner can return to the start screen and paste
 
 ### Edge Cases
 
-- **Very long text**: Learner pastes a multi-page passage. The system should still produce a usable exercise (e.g., by capping or paginating blanks) rather than overwhelming the learner with hundreds of blanks at once.
+- **Very long text**: Learner pastes a multi-page passage. The full passage is shown as context, but the number of blanks is capped per round (FR-025) and the chosen positions are spread across the whole passage (FR-026) so the learner is never confronted with hundreds of inputs at once.
 - **Text with no recognizable words**: Learner pastes only punctuation, numbers, or whitespace. The system should refuse to start and explain what kind of input it needs.
 - **Repeated words**: A target word appears multiple times in the passage. Each occurrence is evaluated independently against what the learner typed in that specific blank.
 - **Case differences**: Learner types the right letters in a different case. The answer is accepted (see FR-019).
@@ -130,6 +143,18 @@ After seeing their results, the learner can return to the start screen and paste
 - **FR-018**: The system MUST work for text in any human language the learner provides, including languages using non-Latin scripts and diacritical marks.
 - **FR-019**: When evaluating an answer against the original word, the system MUST compare them case-insensitively (so "paris" matches "Paris") but accent-sensitively (so "ecole" does NOT match "école"). This rule applies uniformly across all languages and scripts.
 - **FR-020**: Before discarding text or scores from a round, the system MUST ensure the round has been saved as a session that the learner can return to later (in-progress sessions for resumption, completed sessions for review).
+- **FR-021**: The system MUST identify blank candidates using standard Unicode word-break rules: letters and combining marks form a word; whitespace and punctuation are breaks; contractions (e.g., "don't") and hyphenated compounds (e.g., "well-known") are treated as a single token; for scripts without inter-word whitespace (CJK), each character is treated as one token.
+- **FR-022**: The system MUST auto-label every saved session with a human-readable identifier derived from the passage (e.g., the first few words) plus the date the session was started, so the learner can distinguish sessions in the list without naming them manually.
+- **FR-023**: The learner MUST be able to delete any saved session — whether in-progress or completed — from the session list, and the deletion MUST be permanent for that browser.
+- **FR-024**: The system MUST enforce a hard cap on saved sessions (default: 20). When adding a new session would exceed the cap, the system MUST auto-evict the oldest *completed* session to make room. In-progress sessions MUST NOT be auto-evicted; if the cap is reached with no completed sessions available to evict, the system MUST inform the learner and require them to finish or delete an existing session before starting a new one.
+- **FR-025**: The system MUST cap the number of blanks generated per round so that the exercise and its results list remain usable on a single screen (including on a phone). The cap MAY scale with difficulty (Easy = fewer, Hard = more), and the full passage MUST remain visible as context regardless of how many words are turned into blanks.
+- **FR-026**: When a passage is long enough that the cap on blanks per round (FR-025) applies, the system MUST distribute the chosen blank positions across the entire passage rather than concentrating them at the start, so the learner exercises the whole text.
+- **FR-027**: The product MUST conform to WCAG 2.1 Level AA across the screens in the round flow (start, exercise, results, session list), including color-contrast minimums and non-color cues for state (e.g., correct/incorrect not signaled by color alone).
+- **FR-028**: Every interactive element — pasting text, picking difficulty, every blank input, submission, navigating between blanks, opening/deleting a saved session — MUST be reachable and operable using a keyboard alone, with focus order matching the reading order of the passage.
+- **FR-029**: When the results screen appears, the score and the list of incorrect-answer / correct-spelling pairs MUST be exposed to assistive technologies (e.g., via appropriate landmarks/live-region semantics) so a screen-reader user is informed of the outcome and can navigate the review list without sight.
+- **FR-030**: After the initial load of the application's assets, the product MUST NOT transmit any data to any server or third party. Pasted passages, learner answers, scores, session metadata, error/crash details, and usage telemetry MUST all remain on the learner's device.
+- **FR-031**: The product MUST NOT integrate third-party analytics, telemetry, crash-reporting, advertising, or tracking services in v1.
+- **FR-032**: After the application's assets have been loaded once, the product MUST continue to function (start a new round, play, score, view past sessions) without a network connection.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -151,6 +176,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **SC-006**: The product works for at least the major writing systems learners are likely to bring (Latin with diacritics, Cyrillic, Greek, CJK, Arabic, etc.) — verified by completing a round in each.
 - **SC-007**: For the same passage, Hard produces meaningfully more blanks than Easy (target: at least 2x as many), and the average length of blanked words is noticeably greater at Hard than at Easy (target: at least 2 characters longer on average).
 - **SC-008**: A learner who closes the tab mid-round and reopens it in the same browser within the next 7 days finds their in-progress round restored in at least 95% of cases (failures attributable only to the browser clearing site data).
+- **SC-009**: The round flow (start → exercise → results → session list) passes an accessibility audit covering both automated checks (no critical/serious violations) and a manual screen-reader and keyboard-only pass against WCAG 2.1 AA before launch.
 
 ## Assumptions
 
@@ -159,6 +185,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **What "longer words" means**: At Hard, the system favors words above some character-length threshold; at Easy, it favors words at or below that threshold. The exact threshold is a tuning detail to be decided during implementation, not a spec-level decision.
 - **No accounts, no server-side sync**: There is no user account, no login, and no server-side history. Persistence is entirely local to the browser. Two browsers, two profiles, or two devices = two independent worlds of sessions.
 - **Local persistence layer**: The product uses the browser's built-in local storage capabilities. If those are unavailable (private mode in some browsers, storage quotas exhausted, user has disabled site data), the current round still plays through in memory and the learner is informed that nothing will be saved.
-- **Punctuation is not blanked**: Only words (letter sequences) are candidates for blanking. Punctuation, numbers, and whitespace stay visible as context regardless of difficulty.
+- **Punctuation is not blanked**: Only words (as defined by FR-021's Unicode word-break rules) are candidates for blanking. Punctuation, numbers, and whitespace stay visible as context regardless of difficulty.
 - **Matching rule is uniform**: The case-insensitive / accent-sensitive rule (FR-019) applies the same way for every language. The product does not try to special-case, e.g., German ß ↔ ss or other language-specific spelling equivalences in v1.
 - **Web-first delivery**: The product is delivered as a web experience that runs in a modern browser on desktop and mobile. Native apps are out of scope for v1.
+- **Fully offline after first load**: The app may need a network connection to fetch its initial assets, but no learner content, answers, or telemetry leaves the device thereafter (FR-030, FR-031), and the app keeps working without a network connection once loaded (FR-032). The specific mechanism for offline asset availability is a planning concern, not a spec one.
