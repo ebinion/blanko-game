@@ -12,6 +12,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 **Component**: `routes/home.tsx`
 
 **Loader behavior**:
+
 - If at least one session has `status === "in_progress"`, redirect to `/play/:id` for the most recent in-progress session by `createdAt`.
 - Otherwise redirect to `/play`.
 
@@ -26,6 +27,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 **Loader returns**: `{ lastDifficulty: Difficulty, saveDisabled: boolean }`.
 
 **Renders** (composed entirely from shadcn primitives + the bespoke `PassageView`):
+
 - A shadcn `<Textarea>` for the passage paste area, with a shadcn `<Label>` "Paste a passage in your target language".
 - A shadcn `<ToggleGroup type="single">` with three `<ToggleGroupItem>`s (Easy / Medium / Hard), defaulted to `lastDifficulty`.
 - A shadcn `<Button>` "Start round".
@@ -33,6 +35,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 - A link to `/sessions`.
 
 **Action** (`POST /play`):
+
 - Inputs: `{ passage: string, difficulty: Difficulty }`.
 - Calls `tokenize`, then `selectBlanks`. If `selectBlanks` returns `[]`, returns a 422-style action result `{ error: "no_eligible_words" }` consumed by the page (rendered in a shadcn `<Alert>`).
 - Otherwise creates a new `Session`, persists it via `session-store.create`, updates `settings.lastDifficulty`, then `redirect`s to `/play/:sessionId`.
@@ -47,11 +50,13 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 **Loader returns**: `{ session: Session, saveDisabled: boolean }`. If the session does not exist or is already completed, the loader `redirect`s to `/sessions`.
 
 **Renders**:
+
 - `<PassageView session={session} />` — the bespoke component that walks `session.tokens` and renders text spans for non-blanked tokens and a shadcn `<Input>` per blank, with `aria-label` describing the blank.
 - A shadcn `<Button>` "Submit answers".
 - A shadcn `<Button variant="outline">` "Save and exit" (just navigates to `/sessions`; answers are persisted on every keystroke via the action below).
 
 **Action** (`POST /play/:sessionId`):
+
 - Two intents (via a hidden `intent` field):
   - `"save_answer"`: `{ blankId, value }` → writes `session.answers[blankId] = value` and returns `null` (called from each `<Input>`'s `onBlur` for cheap persistence).
   - `"submit"`: runs `scoreSession`, marks the session `completed`, stores the `Result`, then `redirect`s to `/results/:sessionId`.
@@ -65,6 +70,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 **Loader returns**: `{ session: Session }`. If the session is not completed, the loader `redirect`s to `/play/:sessionId`. If the session does not exist, redirect to `/sessions`.
 
 **Renders**:
+
 - Score block: a shadcn `<Card>` with `role="status"` and `aria-live="polite"` containing the text "X of Y correct".
 - Review list (if `session.result.incorrect.length > 0`): a semantic `<ul>` of rows, each row containing the learner's answer and the correct spelling, with a shadcn `<Badge>` marked "Incorrect" plus a lucide `XCircle` icon (non-color cue).
 - If `incorrect.length === 0`: a shadcn `<Alert>` "Perfect score — nothing to review".
@@ -82,6 +88,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 **Loader returns**: `{ sessions: Session[], saveDisabled: boolean }` sorted by `createdAt` descending.
 
 **Renders**:
+
 - If `sessions.length === 0`: a shadcn `<Alert>` empty-state with a `<Button>` "Start your first round" → `/play`.
 - Otherwise a list of shadcn `<Card>` rows, each row showing:
   - `session.label` as the row title.
@@ -92,6 +99,7 @@ All routes are client-rendered. `clientLoader` reads `localStorage` synchronousl
 - If `saveDisabled`: a shadcn `<Alert variant="destructive">` explaining new sessions won't be saved.
 
 **Action** (`POST /sessions`):
+
 - Intent: `"delete"` with `{ sessionId }` → removes the session, triggers a shadcn `<Sonner>` toast confirming deletion, and re-renders the list.
 
 ---

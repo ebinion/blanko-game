@@ -37,5 +37,5 @@ export default defineConfig(
       'react/react-in-jsx-scope': 0,
       semi: 'off',
     },
-  }
+  },
 )

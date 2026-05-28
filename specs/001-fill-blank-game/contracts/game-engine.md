@@ -10,7 +10,7 @@ The engine has no dependency on React, the DOM, or `localStorage`. Every functio
 ## `tokenize`
 
 ```ts
-function tokenize(passage: string): Token[];
+function tokenize(passage: string): Token[]
 ```
 
 Splits `passage` into `Token` objects per [../data-model.md](../data-model.md) using `Intl.Segmenter` with `granularity: "word"`, plus a post-pass merging:
@@ -20,6 +20,7 @@ Splits `passage` into `Token` objects per [../data-model.md](../data-model.md) u
 - CJK ideographs: one `Token` per character (each with `isWord: true`)
 
 **Postconditions**:
+
 - `tokens.map(t => t.text).join("") === passage` (exhaustive coverage).
 - Tokens are sorted by `start`.
 - A token with `isWord: false` is whitespace, punctuation, numbers, or symbols; never a candidate for blanking.
@@ -35,12 +36,13 @@ function selectBlanks(
   tokens: Token[],
   difficulty: Difficulty,
   options?: { sessionId: string },
-): Blank[];
+): Blank[]
 ```
 
 Picks blank positions deterministically from `tokens` per the rules in [../research.md](../research.md) §3.
 
 **Postconditions**:
+
 - `result.length ≤ blankCap[difficulty]` (Easy: 8, Medium: 14, Hard: 20).
 - Every returned blank's `tokenIndex` refers to a token with `isWord === true`.
 - `result` is sorted by `tokenIndex` ascending; `tokenIndex` values are unique.
@@ -55,22 +57,21 @@ Picks blank positions deterministically from `tokens` per the rules in [../resea
 ## `scoreSession`
 
 ```ts
-function scoreSession(
-  session: Session,
-): Result;
+function scoreSession(session: Session): Result
 ```
 
 Evaluates each blank in `session.blanks` against `session.answers[blankId]` using the case-insensitive, accent-sensitive rule (FR-019).
 
 **Postconditions**:
+
 - `result.score.total === session.blanks.length`.
 - `result.score.correct + result.incorrect.length === result.score.total`.
 - A blank with no entry in `session.answers`, or an entry whose `.trim()` is empty, is treated as incorrect (FR-012).
 - The comparison is:
   ```ts
-  const a = userAnswer.trim().normalize('NFC').toLocaleLowerCase();
-  const b = correctWord.normalize('NFC').toLocaleLowerCase();
-  const correct = a === b;
+  const a = userAnswer.trim().normalize('NFC').toLocaleLowerCase()
+  const b = correctWord.normalize('NFC').toLocaleLowerCase()
+  const correct = a === b
   ```
 
 **Throws**: never. Does not mutate `session`.
@@ -80,7 +81,7 @@ Evaluates each blank in `session.blanks` against `session.answers[blankId]` usin
 ## `labelSession`
 
 ```ts
-function labelSession(passage: string, createdAt: Date): string;
+function labelSession(passage: string, createdAt: Date): string
 ```
 
 Computes the human-readable auto-label per FR-022.
@@ -95,13 +96,13 @@ Computes the human-readable auto-label per FR-022.
 
 ```ts
 interface DifficultyConfig {
-  density: number;     // 0.10 | 0.20 | 0.30
-  minWordLength: number;
-  maxWordLength?: number;
-  blankCap: number;    // 8 | 14 | 20
+  density: number // 0.10 | 0.20 | 0.30
+  minWordLength: number
+  maxWordLength?: number
+  blankCap: number // 8 | 14 | 20
 }
 
-function difficultyConfig(difficulty: Difficulty): DifficultyConfig;
+function difficultyConfig(difficulty: Difficulty): DifficultyConfig
 ```
 
 Returns the tuning parameters for the difficulty per the table in research.md §3. Callers MUST go through this function rather than hard-coding parameters elsewhere.

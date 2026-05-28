@@ -1,76 +1,79 @@
-import { useState } from "react";
-import { redirect, useFetcher, useLoaderData } from "react-router";
-import type { Route } from "./+types/play.$sessionId";
-import { Button } from "~/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { PassageView } from "~/components/passage-view";
-import { get, update } from "~/storage/session-store";
-import { scoreSession } from "~/engine/score";
-import { isSaveDisabled } from "~/storage/safe-storage";
+import { useState } from 'react'
+import { redirect, useFetcher, useLoaderData } from 'react-router'
+import type { Route } from './+types/play.$sessionId'
+import { Button } from '~/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { PassageView } from '~/components/passage-view'
+import { get, update } from '~/storage/session-store'
+import { scoreSession } from '~/engine/score'
+import { isSaveDisabled } from '~/storage/safe-storage'
 
 export function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const session = get(params.sessionId);
-  if (!session || session.status === "completed") {
-    return redirect("/sessions");
+  const session = get(params.sessionId)
+  if (!session || session.status === 'completed') {
+    return redirect('/sessions')
   }
-  return { session, saveDisabled: isSaveDisabled() };
+  return { session, saveDisabled: isSaveDisabled() }
 }
 
-export async function clientAction({ request, params }: Route.ClientActionArgs) {
-  const formData = await request.formData();
-  const intent = formData.get("intent") as string;
+export async function clientAction({
+  request,
+  params,
+}: Route.ClientActionArgs) {
+  const formData = await request.formData()
+  const intent = formData.get('intent') as string
 
-  if (intent === "save_answer") {
-    const blankId = formData.get("blankId") as string;
-    const value = formData.get("value") as string;
-    const session = get(params.sessionId);
+  if (intent === 'save_answer') {
+    const blankId = formData.get('blankId') as string
+    const value = formData.get('value') as string
+    const session = get(params.sessionId)
     if (session) {
       update(session.id, {
         answers: { ...session.answers, [blankId]: value },
-      });
+      })
     }
-    return null;
+    return null
   }
 
-  if (intent === "submit") {
-    const session = get(params.sessionId);
-    if (!session) return redirect("/sessions");
-    const result = scoreSession(session);
-    update(session.id, { status: "completed", result });
-    return redirect(`/results/${session.id}`);
+  if (intent === 'submit') {
+    const session = get(params.sessionId)
+    if (!session) return redirect('/sessions')
+    const result = scoreSession(session)
+    update(session.id, { status: 'completed', result })
+    return redirect(`/results/${session.id}`)
   }
 
-  return null;
+  return null
 }
 
 export default function PlaySession() {
-  const { session, saveDisabled } = useLoaderData<typeof clientLoader>();
-  const fetcher = useFetcher();
+  const { session, saveDisabled } = useLoaderData<typeof clientLoader>()
+  const fetcher = useFetcher()
 
   // Local state so controlled inputs update immediately on each keystroke.
   // Initialized from persisted answers so resuming a session pre-fills blanks.
   const [answers, setAnswers] = useState<Record<string, string>>(
-    session.answers
-  );
+    session.answers,
+  )
 
   function handleAnswerChange(blankId: string, value: string) {
-    setAnswers((prev) => ({ ...prev, [blankId]: value }));
+    setAnswers((prev) => ({ ...prev, [blankId]: value }))
   }
 
   function handleBlur(blankId: string, value: string) {
     // Persist to localStorage on blur so a closed tab can be resumed
     update(session.id, {
       answers: { ...session.answers, ...answers, [blankId]: value },
-    });
+    })
     fetcher.submit(
-      { intent: "save_answer", blankId, value },
-      { method: "post" }
-    );
+      { intent: 'save_answer', blankId, value },
+      { method: 'post' },
+    )
   }
 
   function handleSubmit() {
     // Flush all current answers to storage before scoring
-    update(session.id, { answers });
+    update(session.id, { answers })
   }
 
   return (
@@ -104,5 +107,5 @@ export default function PlaySession() {
         <Button type="submit">Submit answers</Button>
       </fetcher.Form>
     </div>
-  );
+  )
 }

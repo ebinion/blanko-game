@@ -21,7 +21,7 @@ The value is a JSON string. After `JSON.parse`, it conforms to the `Store` shape
 {
   "schemaVersion": 1,
   "settings": {
-    "lastDifficulty": "medium"
+    "lastDifficulty": "medium",
   },
   "sessions": [
     {
@@ -31,19 +31,27 @@ The value is a JSON string. After `JSON.parse`, it conforms to the `Store` shape
       "practiceText": "La mer est calme et le ciel est bleu.",
       "difficulty": "medium",
       "tokens": [
-        { "text": "La",    "start":  0, "end":  2, "isWord": true  },
-        { "text": " ",     "start":  2, "end":  3, "isWord": false },
-        { "text": "mer",   "start":  3, "end":  6, "isWord": true  }
+        { "text": "La", "start": 0, "end": 2, "isWord": true },
+        { "text": " ", "start": 2, "end": 3, "isWord": false },
+        { "text": "mer", "start": 3, "end": 6, "isWord": true },
         /* ... */
       ],
       "blanks": [
-        { "id": "01J9X7P2QC8Y6P3N4F6KZTQAN6-4", "tokenIndex": 4,  "correctWord": "calme" },
-        { "id": "01J9X7P2QC8Y6P3N4F6KZTQAN6-10", "tokenIndex": 10, "correctWord": "bleu"  }
+        {
+          "id": "01J9X7P2QC8Y6P3N4F6KZTQAN6-4",
+          "tokenIndex": 4,
+          "correctWord": "calme",
+        },
+        {
+          "id": "01J9X7P2QC8Y6P3N4F6KZTQAN6-10",
+          "tokenIndex": 10,
+          "correctWord": "bleu",
+        },
       ],
       "answers": {
-        "01J9X7P2QC8Y6P3N4F6KZTQAN6-4": "calme"
+        "01J9X7P2QC8Y6P3N4F6KZTQAN6-4": "calme",
       },
-      "status": "in_progress"
+      "status": "in_progress",
     },
     {
       "id": "01J9X1ABXCAEY7Q9HJ52F3P2RH",
@@ -51,9 +59,15 @@ The value is a JSON string. After `JSON.parse`, it conforms to the `Store` shape
       "label": "The quick brown fox · 2026-05-27",
       "practiceText": "The quick brown fox jumps over the lazy dog.",
       "difficulty": "easy",
-      "tokens": [ /* ... */ ],
-      "blanks":  [ /* ... */ ],
-      "answers": { /* ... */ },
+      "tokens": [
+        /* ... */
+      ],
+      "blanks": [
+        /* ... */
+      ],
+      "answers": {
+        /* ... */
+      },
       "status": "completed",
       "result": {
         "score": { "correct": 5, "total": 6 },
@@ -61,12 +75,12 @@ The value is a JSON string. After `JSON.parse`, it conforms to the `Store` shape
           {
             "blankId": "01J9X1ABXCAEY7Q9HJ52F3P2RH-7",
             "userAnswer": "lasy",
-            "correctWord": "lazy"
-          }
-        ]
-      }
-    }
-  ]
+            "correctWord": "lazy",
+          },
+        ],
+      },
+    },
+  ],
 }
 ```
 

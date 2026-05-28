@@ -1,4 +1,5 @@
 <!-- SPECKIT START -->
+
 Current feature plan: [specs/001-fill-blank-game/plan.md](./specs/001-fill-blank-game/plan.md)
 
 Supporting design artifacts (Phase 0 / Phase 1):
@@ -13,4 +14,5 @@ Supporting design artifacts (Phase 0 / Phase 1):
 Read the plan for the technology stack, project structure, shell commands,
 and constitution-aligned constraints (test-first, type-safety, shadcn-first
 UI, simplicity/YAGNI, local-first data).
+
 <!-- SPECKIT END -->
