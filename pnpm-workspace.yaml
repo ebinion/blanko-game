@@ -1,5 +1,5 @@
 savePrefix: ''
-onlyBuiltDependencies:
-  - esbuild
-  - msw
-  - sharp
+allowBuilds:
+  esbuild: true
+  msw: true
+  sharp: true
