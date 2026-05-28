@@ -1,1 +1,5 @@
 savePrefix: ''
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+  - sharp
