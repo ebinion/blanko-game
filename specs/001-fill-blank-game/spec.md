@@ -18,7 +18,7 @@
 - Q: What accessibility baseline should v1 commit to? → A: WCAG 2.1 Level AA, plus keyboard-complete navigation and screen-reader-readable score and review list. Every blank is reachable by keyboard with reading-order focus; the score and incorrect-word list are announced; color/contrast meets AA.
 - Q: What is v1's privacy stance on the pasted text and on usage telemetry? → A: Fully offline. After the initial load of the application's assets, nothing leaves the device — no passage content, no answers, no telemetry, no analytics, no crash/error reporting. The app should also continue to work without a network connection once loaded.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Practice spelling and recall using my own text (Priority: P1)
 
@@ -58,7 +58,7 @@ Before starting, the learner picks a difficulty level (e.g., Easy / Medium / Har
 
 After completing a round, the learner sees each word they got wrong shown alongside the correct spelling so they can compare letter by letter. This turns a passive score into a learning moment.
 
-**Why this priority**: The score by itself tells the learner *how well* they did, but the misspelled-word review is what actually helps them improve. It is part of the original feature description and tightly coupled to Story 1, but conceptually it is a separable presentation concern that can be iterated on independently (e.g., highlighting differing letters later).
+**Why this priority**: The score by itself tells the learner _how well_ they did, but the misspelled-word review is what actually helps them improve. It is part of the original feature description and tightly coupled to Story 1, but conceptually it is a separable presentation concern that can be iterated on independently (e.g., highlighting differing letters later).
 
 **Independent Test**: Complete a round in which at least one answer is wrong, then verify the results screen lists each incorrect answer next to its correct spelling, in a form the learner can read and compare without scrolling past unrelated information.
 
@@ -119,7 +119,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **Local storage full or disabled**: Browser storage is unavailable or full. The current round still plays through to results in memory, but the system tells the learner that sessions won't be saved.
 - **Difficulty with no eligible words**: Learner picks Hard but their passage has no long words. The system explains the mismatch and offers to lower the difficulty.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -146,7 +146,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **FR-021**: The system MUST identify blank candidates using standard Unicode word-break rules: letters and combining marks form a word; whitespace and punctuation are breaks; contractions (e.g., "don't") and hyphenated compounds (e.g., "well-known") are treated as a single token; for scripts without inter-word whitespace (CJK), each character is treated as one token.
 - **FR-022**: The system MUST auto-label every saved session with a human-readable identifier derived from the passage (e.g., the first few words) plus the date the session was started, so the learner can distinguish sessions in the list without naming them manually.
 - **FR-023**: The learner MUST be able to delete any saved session — whether in-progress or completed — from the session list, and the deletion MUST be permanent for that browser.
-- **FR-024**: The system MUST enforce a hard cap on saved sessions (default: 20). When adding a new session would exceed the cap, the system MUST auto-evict the oldest *completed* session to make room. In-progress sessions MUST NOT be auto-evicted; if the cap is reached with no completed sessions available to evict, the system MUST inform the learner and require them to finish or delete an existing session before starting a new one.
+- **FR-024**: The system MUST enforce a hard cap on saved sessions (default: 20). When adding a new session would exceed the cap, the system MUST auto-evict the oldest _completed_ session to make room. In-progress sessions MUST NOT be auto-evicted; if the cap is reached with no completed sessions available to evict, the system MUST inform the learner and require them to finish or delete an existing session before starting a new one.
 - **FR-025**: The system MUST cap the number of blanks generated per round so that the exercise and its results list remain usable on a single screen (including on a phone). The cap MAY scale with difficulty (Easy = fewer, Hard = more), and the full passage MUST remain visible as context regardless of how many words are turned into blanks.
 - **FR-026**: When a passage is long enough that the cap on blanks per round (FR-025) applies, the system MUST distribute the chosen blank positions across the entire passage rather than concentrating them at the start, so the learner exercises the whole text.
 - **FR-027**: The product MUST conform to WCAG 2.1 Level AA across the screens in the round flow (start, exercise, results, session list), including color-contrast minimums and non-color cues for state (e.g., correct/incorrect not signaled by color alone).
@@ -156,7 +156,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **FR-031**: The product MUST NOT integrate third-party analytics, telemetry, crash-reporting, advertising, or tracking services in v1.
 - **FR-032**: After the application's assets have been loaded once, the product MUST continue to function (start a new round, play, score, view past sessions) without a network connection.
 
-### Key Entities *(include if feature involves data)*
+### Key Entities _(include if feature involves data)_
 
 - **Practice Text**: The passage the learner pasted. Holds the original text exactly as provided and the language/script context. Belongs to a single Session.
 - **Difficulty Level**: The configured difficulty for a Session (Easy / Medium / Hard). Determines blank density and the bias toward longer words.
@@ -164,7 +164,7 @@ After seeing their results, the learner can return to the start screen and paste
 - **Session (Round)**: A single play-through. Holds the practice text, the chosen difficulty, the set of blanks, the learner's answers so far, and — once submitted — the score and review list. Persisted locally in the browser; multiple sessions can coexist.
 - **Result**: The outcome of a completed Session. Holds the score and the list of incorrect-answer / correct-spelling pairs to display on the results screen.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

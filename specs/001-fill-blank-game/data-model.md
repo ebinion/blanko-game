@@ -28,7 +28,7 @@ Store (root document in localStorage)
 ### `Difficulty`
 
 ```ts
-type Difficulty = 'easy' | 'medium' | 'hard';
+type Difficulty = 'easy' | 'medium' | 'hard'
 ```
 
 The configured difficulty for a Session. Determines blank density and the bias toward longer words (see [contracts/game-engine.md](./contracts/game-engine.md)).
@@ -38,19 +38,20 @@ The configured difficulty for a Session. Determines blank density and the bias t
 ```ts
 interface Token {
   /** The exact substring from the original passage. */
-  text: string;
+  text: string
   /** Codepoint offset into the original passage where this token starts. */
-  start: number;
+  start: number
   /** Codepoint offset (exclusive) where this token ends. */
-  end: number;
+  end: number
   /** Whether this is a candidate for blanking. False for whitespace, punctuation, numbers. */
-  isWord: boolean;
+  isWord: boolean
 }
 ```
 
 **Source of truth**: produced by `tokenize(passage: string): Token[]` (see contracts/game-engine.md). The full token array is cached on the Session so re-rendering the passage on resume does not require re-tokenization.
 
 **Validation**:
+
 - `text.length > 0`
 - `start < end` and they fall within the passage bounds
 - Tokens cover the passage exhaustively: `tokens[i].end === tokens[i+1].start`
@@ -61,15 +62,16 @@ interface Token {
 ```ts
 interface Blank {
   /** Stable identifier (e.g., a UUID or `${sessionId}-${tokenIndex}`). */
-  id: string;
+  id: string
   /** Index into Session.tokens — the word being blanked. */
-  tokenIndex: number;
+  tokenIndex: number
   /** The original word at that position. Cached so we can score without re-tokenizing. */
-  correctWord: string;
+  correctWord: string
 }
 ```
 
 **Validation**:
+
 - `tokenIndex` refers to a token whose `isWord` is `true`.
 - `correctWord === session.tokens[tokenIndex].text`.
 - `blanks` are sorted by `tokenIndex` ascending and `tokenIndex` is unique within a session.
@@ -79,25 +81,25 @@ interface Blank {
 ```ts
 interface Session {
   /** Stable identifier (UUID). */
-  id: string;
+  id: string
   /** ISO 8601 instant when the session was created. */
-  createdAt: string;
+  createdAt: string
   /** Human-readable auto-label: "<first 4 words> · <YYYY-MM-DD>". */
-  label: string;
+  label: string
   /** Original passage verbatim. */
-  practiceText: string;
+  practiceText: string
   /** Configured difficulty. */
-  difficulty: Difficulty;
+  difficulty: Difficulty
   /** Cached tokenization of practiceText. */
-  tokens: Token[];
+  tokens: Token[]
   /** Chosen blank positions and their correct words. */
-  blanks: Blank[];
+  blanks: Blank[]
   /** Learner's typed answers, keyed by Blank.id. Missing keys treated as empty. */
-  answers: Record<string, string>;
+  answers: Record<string, string>
   /** Lifecycle. */
-  status: 'in_progress' | 'completed';
+  status: 'in_progress' | 'completed'
   /** Final result, present iff status === 'completed'. */
-  result?: Result;
+  result?: Result
 }
 ```
 
@@ -118,6 +120,7 @@ in_progress  ── (learner submits) ──▶  completed
 Auto-eviction (FR-024): when adding a new session would push the count above 20, the **oldest completed session** by `createdAt` is removed first. If none exists, the create is refused and the learner is told to delete or finish an existing in-progress session.
 
 **Validation**:
+
 - `label` is non-empty and ≤ 80 characters.
 - `practiceText` is non-empty after `.trim()`.
 - `tokens` validates per the rules above; `blanks` validates per its rules.
@@ -130,25 +133,26 @@ Auto-eviction (FR-024): when adding a new session would push the count above 20,
 interface Result {
   score: {
     /** Number of blanks the learner answered correctly. */
-    correct: number;
+    correct: number
     /** Total number of blanks in the session. */
-    total: number;
-  };
+    total: number
+  }
   /** One entry per blank the learner answered incorrectly (including blanks left empty). */
-  incorrect: IncorrectEntry[];
+  incorrect: IncorrectEntry[]
 }
 
 interface IncorrectEntry {
   /** Blank.id this entry refers to. */
-  blankId: string;
+  blankId: string
   /** Learner's typed answer, verbatim. May be empty string. */
-  userAnswer: string;
+  userAnswer: string
   /** Correct spelling for the blank (mirrors Blank.correctWord). */
-  correctWord: string;
+  correctWord: string
 }
 ```
 
 **Validation**:
+
 - `score.correct + incorrect.length === score.total`.
 - `score.total === session.blanks.length`.
 - Every `blankId` in `incorrect` refers to a real Blank in the parent session.
@@ -158,7 +162,7 @@ interface IncorrectEntry {
 ```ts
 interface Settings {
   /** The difficulty to default to on the start screen. Updated whenever a round is started. */
-  lastDifficulty: Difficulty;
+  lastDifficulty: Difficulty
 }
 ```
 
@@ -166,13 +170,14 @@ interface Settings {
 
 ```ts
 interface Store {
-  schemaVersion: 1;
-  settings: Settings;
-  sessions: Session[];
+  schemaVersion: 1
+  settings: Settings
+  sessions: Session[]
 }
 ```
 
 **Validation**:
+
 - `schemaVersion === 1`. Any other value triggers a migration slot (none in v1; future versions will branch here).
 - `sessions.length ≤ 20`.
 - Session `id`s are unique within the array.
@@ -186,10 +191,10 @@ interface Store {
 
 ## Relationship to spec entities
 
-| Spec entity | Implementation |
-|---|---|
-| Practice Text | `Session.practiceText` (verbatim original) + `Session.tokens` (derived) |
-| Difficulty Level | `Session.difficulty` of type `Difficulty` |
-| Blank | `Blank` interface (one per blanked position) |
-| Session (Round) | `Session` interface |
-| Result | `Result` interface |
+| Spec entity      | Implementation                                                          |
+| ---------------- | ----------------------------------------------------------------------- |
+| Practice Text    | `Session.practiceText` (verbatim original) + `Session.tokens` (derived) |
+| Difficulty Level | `Session.difficulty` of type `Difficulty`                               |
+| Blank            | `Blank` interface (one per blanked position)                            |
+| Session (Round)  | `Session` interface                                                     |
+| Result           | `Result` interface                                                      |

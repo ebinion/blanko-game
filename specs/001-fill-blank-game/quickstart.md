@@ -75,23 +75,23 @@ To reset:
 
 ```js
 // In devtools console
-localStorage.removeItem('blanko:v1');
-location.reload();
+localStorage.removeItem('blanko:v1')
+location.reload()
 ```
 
 ## Layout map for navigating the code
 
-| Concern | Location |
-|---|---|
-| Routes / page-level orchestration | `app/routes/` |
-| Pure game logic (tokenize, select, score) | `app/engine/` |
-| `localStorage` persistence | `app/storage/` |
-| Shadcn primitives (the entire UI vocabulary) | `app/components/ui/` |
-| The single bespoke component | `app/components/passage-view.tsx` |
-| Vitest unit tests | `tests/unit/` |
-| Vitest component tests | `tests/component/` |
-| Playwright e2e | `tests/e2e/` |
-| Multi-script fixtures | `tests/e2e/scripts/` |
+| Concern                                      | Location                          |
+| -------------------------------------------- | --------------------------------- |
+| Routes / page-level orchestration            | `app/routes/`                     |
+| Pure game logic (tokenize, select, score)    | `app/engine/`                     |
+| `localStorage` persistence                   | `app/storage/`                    |
+| Shadcn primitives (the entire UI vocabulary) | `app/components/ui/`              |
+| The single bespoke component                 | `app/components/passage-view.tsx` |
+| Vitest unit tests                            | `tests/unit/`                     |
+| Vitest component tests                       | `tests/component/`                |
+| Playwright e2e                               | `tests/e2e/`                      |
+| Multi-script fixtures                        | `tests/e2e/scripts/`              |
 
 ## When in doubt
 

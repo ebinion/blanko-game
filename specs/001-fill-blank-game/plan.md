@@ -29,6 +29,7 @@ The implementation is a single React Router v7 SPA. A pure TypeScript "game engi
 **Performance Goals**: Generate and render a fresh exercise for a 500-word passage in under 2 seconds on a mid-range laptop/phone (SC-003). Token segmentation and blank selection are O(n) over passage length; we expect well below 50 ms for 500 words.
 
 **Constraints**:
+
 - Fully offline after first load: no `fetch` / `XHR` / `WebSocket` / `sendBeacon` / `navigator.sendBeacon` / image-pixel calls to any host post-boot (FR-030, FR-031, FR-032).
 - WCAG 2.1 AA across all four screens, including focus order matching reading order of the passage and live-region announcement of the score (FR-027 – FR-029).
 - Case-insensitive, accent-sensitive equality after NFC normalization (FR-019).
@@ -39,17 +40,17 @@ The implementation is a single React Router v7 SPA. A pure TypeScript "game engi
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-evaluated after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-evaluated after Phase 1 design._
 
 Evaluated against `.specify/memory/constitution.md` v1.0.0.
 
-| # | Principle | Evaluation | Verdict |
-|---|---|---|---|
-| I | Test-First (NON-NEGOTIABLE) | Every task in the upcoming tasks.md will be written as "(a) failing test → (b) implementation → (c) refactor". Engine logic (segmentation, blank selection, scoring) and storage are pure modules — trivially unit-testable. UI flows covered by Playwright keyboard-only specs. | PASS |
-| II | Type Safety End-to-End | Project already has `strict: true` and ESLint with `jsx-a11y` and `react-hooks`. New code will define explicit types for `Session`, `Blank`, `Token`, `Result`, `DifficultyConfig`. No `any`; `unknown` + narrowing for `JSON.parse`. React Router typegen runs in `typecheck`. | PASS |
-| III | Component-Driven UI | **Shadcn-first**: every screen is composed from shadcn primitives installed into `app/components/ui/` (`Button`, `Input`, `Textarea`, `Card`, `Alert`, `Label`, `Badge`, `ToggleGroup`, `Separator`, `Sonner`). The only bespoke component is `PassageView` (interleaves inputs with text tokens — no shadcn primitive covers that). All other "feature components" are thin compositions of shadcn primitives, not new primitives. Variants via `cva`. No inline styles. | PASS |
-| IV | Simplicity & YAGNI | No state-management library (route loaders/actions + local component state suffice). No backend. One new dev-dep (`vite-plugin-pwa`) directly mapped to FR-032; alternative ("rely on HTTP cache") rejected in research as unreliable across browsers. No premature abstractions over `localStorage`. | PASS |
-| V | Local-First Data | All session data persists in `localStorage` under one versioned root key. App boots and plays a full round with the network disconnected after first load (verified by a Playwright offline test). No server round-trip exists. | PASS |
+| #   | Principle                   | Evaluation                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Verdict |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| I   | Test-First (NON-NEGOTIABLE) | Every task in the upcoming tasks.md will be written as "(a) failing test → (b) implementation → (c) refactor". Engine logic (segmentation, blank selection, scoring) and storage are pure modules — trivially unit-testable. UI flows covered by Playwright keyboard-only specs.                                                                                                                                                                                          | PASS    |
+| II  | Type Safety End-to-End      | Project already has `strict: true` and ESLint with `jsx-a11y` and `react-hooks`. New code will define explicit types for `Session`, `Blank`, `Token`, `Result`, `DifficultyConfig`. No `any`; `unknown` + narrowing for `JSON.parse`. React Router typegen runs in `typecheck`.                                                                                                                                                                                           | PASS    |
+| III | Component-Driven UI         | **Shadcn-first**: every screen is composed from shadcn primitives installed into `app/components/ui/` (`Button`, `Input`, `Textarea`, `Card`, `Alert`, `Label`, `Badge`, `ToggleGroup`, `Separator`, `Sonner`). The only bespoke component is `PassageView` (interleaves inputs with text tokens — no shadcn primitive covers that). All other "feature components" are thin compositions of shadcn primitives, not new primitives. Variants via `cva`. No inline styles. | PASS    |
+| IV  | Simplicity & YAGNI          | No state-management library (route loaders/actions + local component state suffice). No backend. One new dev-dep (`vite-plugin-pwa`) directly mapped to FR-032; alternative ("rely on HTTP cache") rejected in research as unreliable across browsers. No premature abstractions over `localStorage`.                                                                                                                                                                     | PASS    |
+| V   | Local-First Data            | All session data persists in `localStorage` under one versioned root key. App boots and plays a full round with the network disconnected after first load (verified by a Playwright offline test). No server round-trip exists.                                                                                                                                                                                                                                           | PASS    |
 
 **Result**: No violations. Complexity Tracking table is empty.
 
@@ -151,16 +152,16 @@ vite.config.ts                      # Add vite-plugin-pwa registration
 
 After producing `research.md`, `data-model.md`, `contracts/*`, and `quickstart.md`, the design still satisfies every principle:
 
-| # | Principle | Post-design evidence | Verdict |
-|---|---|---|---|
-| I | Test-First (NON-NEGOTIABLE) | `contracts/game-engine.md` enumerates the per-function test obligations; the project tree carves out `tests/unit/`, `tests/component/`, and `tests/e2e/` matching those obligations. | PASS |
-| II | Type Safety End-to-End | `data-model.md` defines explicit interfaces for every entity; `app/engine/types.ts` is named as the single source of truth; no `any` introduced. | PASS |
-| III | Component-Driven UI | The route contracts in `contracts/routes.md` describe each screen as a composition of named shadcn primitives plus the single bespoke `PassageView`. No new primitives invented. | PASS |
-| IV | Simplicity & YAGNI | One dev-dep added (`vite-plugin-pwa`) and justified by Principle V + FR-032. No state library, no backend, no ORM, no parallel type defs. Feature compositions live inline until promotion is warranted. | PASS |
-| V | Local-First Data | `contracts/storage-schema.md` defines one versioned `localStorage` key; `quickstart.md` documents the offline verification step; service worker precaches the shell so the round flow works with the network blocked. | PASS |
+| #   | Principle                   | Post-design evidence                                                                                                                                                                                                  | Verdict |
+| --- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| I   | Test-First (NON-NEGOTIABLE) | `contracts/game-engine.md` enumerates the per-function test obligations; the project tree carves out `tests/unit/`, `tests/component/`, and `tests/e2e/` matching those obligations.                                  | PASS    |
+| II  | Type Safety End-to-End      | `data-model.md` defines explicit interfaces for every entity; `app/engine/types.ts` is named as the single source of truth; no `any` introduced.                                                                      | PASS    |
+| III | Component-Driven UI         | The route contracts in `contracts/routes.md` describe each screen as a composition of named shadcn primitives plus the single bespoke `PassageView`. No new primitives invented.                                      | PASS    |
+| IV  | Simplicity & YAGNI          | One dev-dep added (`vite-plugin-pwa`) and justified by Principle V + FR-032. No state library, no backend, no ORM, no parallel type defs. Feature compositions live inline until promotion is warranted.              | PASS    |
+| V   | Local-First Data            | `contracts/storage-schema.md` defines one versioned `localStorage` key; `quickstart.md` documents the offline verification step; service worker precaches the shell so the round flow works with the network blocked. | PASS    |
 
 **Result**: No new violations introduced by design. Complexity Tracking table remains empty.
 
 ## Complexity Tracking
 
-*No violations to track — the Constitution Check passed all five gates both before and after design.*
+_No violations to track — the Constitution Check passed all five gates both before and after design._
