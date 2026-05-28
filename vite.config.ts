@@ -32,7 +32,22 @@ export default defineConfig({
       },
     }),
   ],
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-dom/client",
+      "@base-ui/react/button",
+      "@base-ui/react/input",
+      "@base-ui/react/merge-props",
+      "@base-ui/react/separator",
+      "@base-ui/react/toggle",
+      "@base-ui/react/toggle-group",
+      "@base-ui/react/use-render",
+    ],
+  },
   resolve: {
+    dedupe: ["react", "react-dom"],
     tsconfigPaths: true,
   },
 });

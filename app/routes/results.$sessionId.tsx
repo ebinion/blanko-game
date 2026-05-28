@@ -65,8 +65,8 @@ export default function Results() {
       )}
 
       <div className="flex gap-3">
-        <Button render={<Link to="/play" />}>Start new round</Button>
-        <Button variant="outline" render={<Link to="/sessions" />}>
+        <Button nativeButton={false} render={<Link to="/play" />}>Start new round</Button>
+        <Button nativeButton={false} variant="outline" render={<Link to="/sessions" />}>
           Back to sessions
         </Button>
       </div>

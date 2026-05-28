@@ -43,7 +43,7 @@ export default function Sessions() {
         <Alert className="mb-4">
           <AlertTitle>No sessions yet</AlertTitle>
           <AlertDescription>
-            <Button render={<Link to="/play" />} className="mt-2">
+            <Button nativeButton={false} render={<Link to="/play" />} className="mt-2">
               Start your first round
             </Button>
           </AlertDescription>
