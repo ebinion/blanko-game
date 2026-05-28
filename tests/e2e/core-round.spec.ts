@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-const FIXTURES = join(__dirname, "scripts");
+const FIXTURES = join(import.meta.dirname, "scripts");
 
 async function runRound(
   page: Page,

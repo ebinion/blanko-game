@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { redirect, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/play.$sessionId";
 import { Button } from "~/components/ui/button";
@@ -46,17 +47,30 @@ export default function PlaySession() {
   const { session, saveDisabled } = useLoaderData<typeof clientLoader>();
   const fetcher = useFetcher();
 
+  // Local state so controlled inputs update immediately on each keystroke.
+  // Initialized from persisted answers so resuming a session pre-fills blanks.
+  const [answers, setAnswers] = useState<Record<string, string>>(
+    session.answers
+  );
+
   function handleAnswerChange(blankId: string, value: string) {
-    update(session.id, {
-      answers: { ...session.answers, [blankId]: value },
-    });
+    setAnswers((prev) => ({ ...prev, [blankId]: value }));
   }
 
   function handleBlur(blankId: string, value: string) {
+    // Persist to localStorage on blur so a closed tab can be resumed
+    update(session.id, {
+      answers: { ...session.answers, ...answers, [blankId]: value },
+    });
     fetcher.submit(
       { intent: "save_answer", blankId, value },
       { method: "post" }
     );
+  }
+
+  function handleSubmit() {
+    // Flush all current answers to storage before scoring
+    update(session.id, { answers });
   }
 
   return (
@@ -79,12 +93,13 @@ export default function PlaySession() {
       <div className="mb-6">
         <PassageView
           session={session}
+          answers={answers}
           onAnswerChange={handleAnswerChange}
           onBlur={handleBlur}
         />
       </div>
 
-      <fetcher.Form method="post">
+      <fetcher.Form method="post" onSubmit={handleSubmit}>
         <input type="hidden" name="intent" value="submit" />
         <Button type="submit">Submit answers</Button>
       </fetcher.Form>

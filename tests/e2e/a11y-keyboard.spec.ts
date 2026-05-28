@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 const frenchFixture = readFileSync(
-  join(__dirname, "scripts/latin-fr.txt"),
+  join(import.meta.dirname, "scripts/latin-fr.txt"),
   "utf-8"
 ).trim();
 

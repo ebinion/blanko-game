@@ -3,11 +3,11 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 const frenchFixture = readFileSync(
-  join(__dirname, "scripts/latin-fr.txt"),
+  join(import.meta.dirname, "scripts/latin-fr.txt"),
   "utf-8"
 ).trim();
 const cyrillicFixture = readFileSync(
-  join(__dirname, "scripts/cyrillic-ru.txt"),
+  join(import.meta.dirname, "scripts/cyrillic-ru.txt"),
   "utf-8"
 ).trim();
 
