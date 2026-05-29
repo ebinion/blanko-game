@@ -76,9 +76,10 @@ if you want to read what the AI produced at each stage.
 
 ## What I learned
 
-**Get constitution → spec → clarify → plan done in a single PR.** Spec Kit's branch-naming
-conventions assume one feature branch carries you through the whole spec-to-plan arc.
-Splitting it across branches fights the tooling.
+**Get spec → clarify → plan done in a single PR.** Spec Kit's branch-naming conventions
+assume one feature branch carries you through that whole arc, so splitting those stages
+across branches fights the tooling. The constitution is the exception — it's project-wide
+rather than feature-scoped, and is best handled in its own separate PR.
 
 **Two CLIs pulled their weight.** The [GitHub CLI](https://cli.github.com/) and the
 [Playwright CLI](https://playwright.dev/docs/test-cli) were the right call — giving the AI
@@ -88,8 +89,9 @@ direct command-line access to PRs and to a real browser made the loop much tight
 code (the clarify step especially) is where spec-driven development earned its keep. The
 spec and plan are genuinely good documents.
 
-**Implementation is where it got rough.** Spec Kit leans toward "one-shotting" the whole
-implementation, and I'm not a fan of that approach for anything non-trivial. The first pass:
+**Implementation is where it got rough.** Spec Kit's own examples and intro video lean
+toward "one-shotting" a whole app from a single spec, and I'm not convinced that's the right
+approach for anything non-trivial. The first pass:
 
 - Invented its own visual design for the app — I had to explicitly force it onto shadcn
   components.
@@ -98,8 +100,11 @@ implementation, and I'm not a fan of that approach for anything non-trivial. The
   correctly before implementation even started).
 - Needed Prettier run manually across everything at the end.
 
-The takeaway: the spec/plan phases are worth adopting wholesale; the implementation phase
-wants to be broken into smaller, reviewable steps rather than trusted to land in one shot.
+The takeaway: the spec/plan phases are worth adopting wholesale. For implementation, I
+suspect the tool is better used by breaking the work into _multiple, smaller specs_ rather
+than one big one — which also seems closer to how developers in the field are actually using
+it. That's the basis for a planned follow-up experiment: take the same kind of project but
+decompose it into several specs and see whether the implementation phase holds up better.
 
 ## Tech stack
 
