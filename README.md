@@ -1,87 +1,159 @@
-# Welcome to React Router!
+# Blanko
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A fill-in-the-blank game for reinforcing foreign-language spelling and recall — paste a
+passage in your target language, pick a difficulty, fill in the missing words, and get a
+score plus a review of every word you missed alongside its correct spelling.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+But the game is really the excuse. **This repo is a field test of two things at once:**
+building an entire codebase with AI (no hand-written code), and learning
+[GitHub's Spec Kit](https://github.com/github/spec-kit) as the workflow for doing it.
 
-## Features
+If you're a designer or developer curious about spec-driven development with AI, the notes
+below are the actual point — what the process felt like, where it held up, and where it
+didn't.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+**▶ Try it live: [blanko-game.netlify.app](https://blanko-game.netlify.app/)**
 
-## Getting Started
+## The experiment
 
-### Installation
+I set three goals and deliberately kept the surface area small:
 
-Install the dependencies:
+1. **Learn Spec Kit, and _only_ Spec Kit.** No other new tools, frameworks, or techniques —
+   so that anything that felt awkward could be attributed to the workflow rather than to
+   five unfamiliar things at once.
+2. **Let AI build the whole thing.** No hand-coding. If the code was wrong, the fix had to
+   come from steering the AI, not from me opening the file.
+3. **Ship something genuinely useful** — a language-practice tool I'd actually open.
+
+The honest risk going in: the idea might be _too small_ to learn anything meaningful about
+the workflow. (Verdict: it was small, but not too small — see below.)
+
+## What Blanko does
+
+Foreign-language learners need lots of different ways to drill the same material. Blanko
+targets spelling and recall specifically:
+
+- **Bring your own text.** Paste any passage in any language. Nothing is pre-baked.
+- **Pick a difficulty.** Easy / Medium / Hard. Higher difficulty blanks out more words and
+  biases toward longer, less-predictable ones; blanks are spread across the whole passage,
+  not bunched at the top.
+- **Fill in the blanks.** The full passage stays on screen as context, with input fields
+  where the words used to be.
+- **Get scored and learn from it.** Scoring is case-insensitive but accent-sensitive
+  (`paris` ✅, `ecole` ❌ for `école`). The results screen pairs every wrong answer with the
+  correct spelling so you can compare letter by letter.
+- **Come back later.** Sessions persist in `localStorage` — resume an in-progress round or
+  reopen a finished one. No login.
+- **Works offline and stays private.** After first load, nothing leaves the device — no
+  passage text, no answers, no telemetry. A service worker keeps it playable with the
+  network off.
+
+## The Spec Kit process
+
+Spec Kit structures the work as a sequence of stages, each producing a durable artifact
+before any code gets written:
+
+```
+constitution  →  spec  →  clarify  →  plan  →  implement
+```
+
+- **Constitution** — the project's non-negotiable principles (test-first, strict types,
+  shadcn-first UI, simplicity/YAGNI, local-first data). See
+  [`.specify/memory/constitution.md`](./.specify/memory/constitution.md).
+- **Spec** — the feature in plain language: user stories, acceptance scenarios, success
+  criteria. No implementation detail. See
+  [`specs/001-fill-blank-game/spec.md`](./specs/001-fill-blank-game/spec.md).
+- **Clarify** — a structured Q&A pass that hunts for ambiguity in the spec and writes the
+  answers back into it (how a "word" is defined, the session cap, the accessibility
+  baseline, the privacy stance).
+- **Plan** — the technical design: stack, project structure, and a constitution check that
+  has to pass before any implementation. See
+  [`specs/001-fill-blank-game/plan.md`](./specs/001-fill-blank-game/plan.md).
+- **Implement** — turn the plan into code.
+
+All of the design artifacts live under [`specs/001-fill-blank-game/`](./specs/001-fill-blank-game/)
+if you want to read what the AI produced at each stage.
+
+## What I learned
+
+**Get constitution → spec → clarify → plan done in a single PR.** Spec Kit's branch-naming
+conventions assume one feature branch carries you through the whole spec-to-plan arc.
+Splitting it across branches fights the tooling.
+
+**Two CLIs pulled their weight.** The [GitHub CLI](https://cli.github.com/) and the
+[Playwright CLI](https://playwright.dev/docs/test-cli) were the right call — giving the AI
+direct command-line access to PRs and to a real browser made the loop much tighter.
+
+**The planning stages were the strong part.** Forcing ambiguity to the surface _before_
+code (the clarify step especially) is where spec-driven development earned its keep. The
+spec and plan are genuinely good documents.
+
+**Implementation is where it got rough.** Spec Kit leans toward "one-shotting" the whole
+implementation, and I'm not a fan of that approach for anything non-trivial. The first pass:
+
+- Invented its own visual design for the app — I had to explicitly force it onto shadcn
+  components.
+- Shipped text inputs that didn't actually work.
+- Left the Playwright tests broken (likely my fault — I don't think e2e was wired up
+  correctly before implementation even started).
+- Needed Prettier run manually across everything at the end.
+
+The takeaway: the spec/plan phases are worth adopting wholesale; the implementation phase
+wants to be broken into smaller, reviewable steps rather than trusted to land in one shot.
+
+## Tech stack
+
+The plan settled on a single, fully-offline SPA with no backend:
+
+- **[React Router v7](https://reactrouter.com/)** (SPA mode), **React 19**, **TypeScript**
+  in `strict` mode
+- **[Tailwind CSS v4](https://tailwindcss.com/)** + **[shadcn](https://ui.shadcn.com/)**
+  components ([Base UI](https://base-ui.com/) under the hood)
+- A pure, framework-free **game engine** (`app/engine/`) for tokenization
+  (`Intl.Segmenter`), blank selection, scoring, and difficulty math — no React or DOM
+  coupling, so it's directly unit-testable
+- **`localStorage`** behind a versioned schema (`app/storage/`); **`vite-plugin-pwa`** for
+  offline-after-first-load
+- **[Vitest](https://vitest.dev/)** for unit/component tests, **[Playwright](https://playwright.dev/)**
+  for keyboard-only e2e flows (including Cyrillic and CJK passages)
+
+## Running it locally
+
+This project uses **pnpm**.
 
 ```bash
-npm install
+pnpm install
+pnpm dev          # dev server at http://localhost:5173
 ```
 
-### Development
-
-Start the development server with HMR:
+Other useful scripts:
 
 ```bash
-npm run dev
+pnpm test         # Vitest in watch mode
+pnpm ci:test      # Vitest once (CI mode)
+pnpm e2e          # Playwright end-to-end tests
+pnpm typecheck    # React Router typegen + tsc
+pnpm lint         # ESLint
+pnpm build        # production build
 ```
 
-Your application will be available at `http://localhost:5173`.
+## Project layout
 
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
+```text
+app/
+├── routes/        # Start, Exercise, Results, Sessions screens
+├── engine/        # Pure game logic: tokenize, select-blanks, score, difficulty, label
+├── storage/       # Versioned localStorage adapter + eviction
+└── components/     # shadcn primitives + the one bespoke component (PassageView)
+specs/
+└── 001-fill-blank-game/   # Spec Kit artifacts: spec, clarifications, plan, contracts
+.specify/
+└── memory/constitution.md # Project principles enforced at every stage
+tests/
+├── unit/ component/ e2e/  # Vitest + Playwright
 ```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
 ---
 
-Built with ❤️ using React Router.
+_In keeping with the experiment, this README was written by Claude from my rough notes on
+the process — not hand-edited by me._
