@@ -11,10 +11,13 @@ import type { Route } from './+types/root'
 import { Toaster } from '~/components/ui/sonner'
 import './app.css'
 
-export const links: Route.LinksFunction = () => [
+export const links: Route.LinksFunction = () => []
+
+export const meta: Route.MetaFunction = () => [
+  { title: 'Blanko' },
   {
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+    name: 'description',
+    content: 'A fill-in-the-blank language practice game.',
   },
 ]
 

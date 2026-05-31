@@ -24,7 +24,7 @@ export function PassageView({
   const totalBlanks = blanks.length
 
   return (
-    <div className="leading-loose text-base">
+    <div className="text-lg leading-loose sm:text-xl">
       {tokens.map((token, idx) => {
         const blankInfo = blanksByTokenIndex.get(idx)
         if (blankInfo) {
@@ -35,11 +35,11 @@ export function PassageView({
             .slice(-2)
             .map((t) => t.text)
             .join(' ')
-          const ariaLabel = `Blank ${num} of ${totalBlanks}${prevWord ? `: word after "${prevWord}"` : ''}. Correct word is "${blank.correctWord}"`
+          const ariaLabel = `blank ${num} of ${totalBlanks}${prevWord ? `: word after "${prevWord}"` : ''}. Correct word is "${blank.correctWord}"`
           return (
             <Input
               key={blank.id}
-              className="inline-block w-auto min-w-[6ch] mx-1 h-7 py-0 text-base align-baseline"
+              className="mx-1 inline-block h-9 w-auto min-w-[7ch] rounded-lg border-2 bg-background px-2 py-0 text-center text-base align-baseline font-semibold shadow-none"
               aria-label={ariaLabel}
               value={currentAnswers[blank.id] ?? ''}
               onChange={(e) => onAnswerChange(blank.id, e.target.value)}

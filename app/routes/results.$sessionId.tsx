@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Badge } from '~/components/ui/badge'
 import { Separator } from '~/components/ui/separator'
-import { Button } from '~/components/ui/button'
+import { buttonVariants } from '~/components/ui/button'
+import { cn } from '~/lib/utils'
 import { XCircle } from 'lucide-react'
 import { get } from '~/storage/session-store'
 
@@ -24,19 +25,26 @@ export default function Results() {
   const { score, incorrect } = result
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Results</h1>
+    <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 lg:py-12">
+      <div className="mb-8 border-b border-foreground/20 pb-6">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[0.08em] text-muted-foreground">
+          Round complete
+        </p>
+        <h1 className="font-heading text-6xl font-semibold leading-none sm:text-7xl">
+          Results<span className="text-primary">.</span>
+        </h1>
+      </div>
 
-      <Card role="status" aria-live="polite" className="mb-6">
+      <Card role="status" aria-live="polite" className="mb-6 bg-primary">
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="font-heading text-5xl font-semibold">
             {score.correct} of {score.total} correct
           </CardTitle>
         </CardHeader>
       </Card>
 
       {incorrect.length === 0 ? (
-        <Alert className="mb-6">
+        <Alert className="mb-6 border-2 border-foreground bg-card">
           <AlertTitle>Perfect score</AlertTitle>
           <AlertDescription>Nothing to review — well done!</AlertDescription>
         </Alert>
@@ -46,16 +54,18 @@ export default function Results() {
             <li key={entry.blankId}>
               <Card>
                 <CardContent className="pt-4 flex items-center gap-3 flex-wrap">
-                  <span className="text-muted-foreground">
+                  <span className="rounded-full bg-muted px-3 py-1 text-foreground/80">
                     {entry.userAnswer.trim() === ''
                       ? '(no answer)'
                       : entry.userAnswer}
                   </span>
                   <Separator orientation="vertical" className="h-5" />
-                  <span className="font-medium">{entry.correctWord}</span>
+                  <span className="rounded-full bg-primary px-3 py-1 font-semibold">
+                    {entry.correctWord}
+                  </span>
                   <Badge
                     variant="destructive"
-                    className="ml-auto flex items-center gap-1"
+                    className="ml-auto flex items-center gap-1 border border-foreground bg-destructive text-foreground"
                   >
                     <XCircle aria-hidden="true" className="h-3.5 w-3.5" />
                     Incorrect
@@ -67,17 +77,16 @@ export default function Results() {
         </ul>
       )}
 
-      <div className="flex gap-3">
-        <Button nativeButton={false} render={<Link to="/play" />}>
+      <div className="flex flex-wrap gap-3">
+        <Link to="/play" className={cn(buttonVariants())}>
           Start new round
-        </Button>
-        <Button
-          nativeButton={false}
-          variant="outline"
-          render={<Link to="/sessions" />}
+        </Link>
+        <Link
+          to="/sessions"
+          className={cn(buttonVariants({ variant: 'outline' }))}
         >
           Back to sessions
-        </Button>
+        </Link>
       </div>
     </div>
   )

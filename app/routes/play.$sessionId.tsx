@@ -77,11 +77,19 @@ export default function PlaySession() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-xl font-semibold mb-2">{session.label}</h1>
-      <p className="text-sm text-muted-foreground mb-6 capitalize">
-        {session.difficulty} difficulty
-      </p>
+    <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 lg:py-12">
+      <div className="mb-8 border-b border-foreground/20 pb-6">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[0.08em] text-muted-foreground">
+          Practice round
+        </p>
+        <h1 className="font-heading text-5xl font-semibold leading-tight sm:text-6xl">
+          {session.label}
+          <span className="text-primary">.</span>
+        </h1>
+        <p className="mt-4 inline-flex rounded-full border-2 border-foreground bg-primary px-4 py-1 text-sm font-semibold capitalize shadow-[0_2px_0_var(--foreground)]">
+          {session.difficulty} difficulty
+        </p>
+      </div>
 
       {saveDisabled && (
         <Alert variant="destructive" className="mb-4">
@@ -93,7 +101,7 @@ export default function PlaySession() {
         </Alert>
       )}
 
-      <div className="mb-6">
+      <div className="mb-8 rounded-3xl border-2 border-foreground bg-card p-5 shadow-[0_3px_0_var(--foreground)] sm:p-8">
         <PassageView
           session={session}
           answers={answers}
@@ -104,7 +112,9 @@ export default function PlaySession() {
 
       <fetcher.Form method="post" onSubmit={handleSubmit}>
         <input type="hidden" name="intent" value="submit" />
-        <Button type="submit">Submit answers</Button>
+        <Button type="submit" size="lg">
+          Submit answers
+        </Button>
       </fetcher.Form>
     </div>
   )
