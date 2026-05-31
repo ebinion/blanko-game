@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"exit:$?\")",
+      "Bash(shasum package.json)",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('package.json'\\)\\);print\\('VALID JSON'\\);print\\('figtree' in json.dumps\\(d\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('package.json'\\)\\); print\\('VALID'\\); print\\('figtree present:', any\\('figtree' in k for k in d['dependencies']\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('package.json'\\)\\);[print\\(k\\) for k in d['dependencies']]\")",
+      "Bash(python3 -c \"import json;json.load\\(open\\('package.json'\\)\\);print\\('package.json VALID'\\)\")",
+      "Bash(python3 -c \"import json;json.load\\(open\\('package.json'\\)\\);print\\('VALID'\\)\")",
+      "Bash(npm run *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(echo \"LINT_EXIT=$?\")",
+      "Bash(echo \"BUILD_EXIT=$?\")",
+      "Read(//private/tmp/**)",
+      "Bash(grep -iE \"built in|client bundle|server bundle\" /tmp/build.log | tail -4; echo \"=== DIFF STAT ===\"; git diff --stat)",
+      "Bash(grep -iE \"error|fail|✓ built|built in\" /tmp/build.log | head; echo \"---lint errors---\"; grep -iE \"error|problem|warning\" /tmp/lint.log | head)",
+      "Read(//tmp/**)",
+      "Bash(git commit *)"
+    ]
+  }
+}
